@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redis Redlock | jiaoqsh's blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="jiaoqsh" />
+    <meta name="kittycheck_rumble" content="true" />
+    <meta name="kittycheck_position" content="top=60,right=60" />
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .tag-1 {
+        font-size: 13pt;
+      }
+      .tag-2 {
+        font-size: 10pt;
+      }
+      .tag-2 {
+        font-size: 8pt;
+      }
+      .tag-4 {
+        font-size: 6pt;
+     }
+    </style>
+    <link href="/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/theme/img/favicon.ico">
+    <link rel="apple-touch-icon" href="/theme/img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/theme/img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/theme/img/apple-touch-icon-114x114.png">
+
+    <link href="/" type="application/atom+xml" rel="alternate" title="jiaoqsh's blog ATOM Feed" />
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/index.html">jiaoqsh's blog </a>
+          <div class="nav-collapse">
+            <ul class="nav">
+                <li class="divider-vertical"></li>
+                <li >
+                  <a href="/category/architecture.html">
+						        <i class="icon-folder-open icon-large"></i>Architecture
+					         </a>
+                </li>
+                <li class="active">
+                  <a href="/category/redis.html">
+						        <i class="icon-folder-open icon-large"></i>Redis
+					         </a>
+                </li>
+              <ul class="nav pull-right">
+                    <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+              </ul>
+
+            </ul>
+            <!--<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>-->
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="span8" id="content">
+<div class="row">
+    <div class="span2">
+        <div class="well">
+<footer class="post-info">
+<abbr class="published" title="2015-01-20T22:00:00+08:00">
+    <i class="icon-calendar"></i>&nbsp;周二 20 一月 2015
+</abbr>
+<br/><a href="/author/jiaoqsh.html"><i class="icon-user"></i>&nbsp;jiaoqsh</a>
+
+
+<br/>
+	&nbsp;&nbsp;<a href="/tag/redis.html" class="label"><i class="icon-tag"></i>&nbsp;redis</a>
+</footer><!-- /.post-info -->        </div>
+    </div>
+    <div class="span6">
+<section id="content" class="well">
+    <article>
+        <header>
+            <h1>
+                <a href=""
+                        rel="bookmark"
+                        title="Permalink to Redis Redlock">
+                        Redis Redlock
+                </a>
+            </h1>
+        </header>
+        <div class="entry-content">
+
+        <p><em>项目功能实现需要使用悲观锁，由于跨JVM获取锁通常借助第三方应用服务来完成。目前比较可靠的、安全的获取分布式的锁是通过ZooKeeper完成，这与 ZooKeeper自身的分布式实现机制有关（此处不再赘述）。目前项目组内是利用Redis获取的锁，并通过线上业务功能验证是可行的。但是：</em></p>
+<blockquote>
+<ul>
+<li>首先目前利用Redis获取的锁不是分布式锁，目前我们连接的redis是sharding集群，主要是用来做缓存的。当一个节点down了或者网络分裂时sharding到这个节点的客户端将无法连接，即redis  shared集群不能自动处理故障转移，不是真正意义上的分布式集群,即存在单点故障。</li>
+<li>虽然现在的实现方式通过了业务验证，是否有潜在问题呢？</li>
+<li>如果用Redis实现分布式锁，但是现在实现的方式真的是最优的么？有没有啥潜在的风险?</li>
+</ul>
+</blockquote>
+<p>对于上述问题，redis的作者已进行了详情的分析讨论，<a href="http://redis.io/topics/distlock">原文</a>。
+下面就对原文中的关键部分做描述，作者提出了Redlock算法，Redis Redlock 即基于redis使用Redlock算法实现DLM (Distributed Lock Manager)。</p>
+<p>三个属性保障设计合理性：</p>
+<blockquote>
+<ul>
+<li>安全性：相互排斥。在任何时刻,只有一个客户端可以持有一个锁。</li>
+<li>可用性A：无死锁，最终总是有可能获得一个锁,即使客户端锁定资源崩溃或者被分区。</li>
+<li>可用性B：容错性，只要有大部分redis节点可用，客户就能够获得和释放锁。</li>
+</ul>
+</blockquote>
+<p><em>注意：下面的讨论是基于redis3.x以前的版本，不是基于redis3.x集群的讨论。</em></p>
+<h4><strong>1. 为什么基于故障转移的实现是不够的</strong></h4>
+<p>简单的使用Redis 锁住一个资源的方法是在一个实例上创建一个key。这个key创建是拥有一个存活时间，使用Redis expire特性，当需要释放锁住的资源时，删除这个key。
+表面上这工作得很好,但是有一个问题:这是一个单点故障的架构。如果Redis master节点down了会发生啥问题？好的,让我们添加一个slave节点! 并使用它如果主不可用。不幸的是,这是不可行。通过这样做,我们不能实现我们的安全属性的相互排斥,因为Redis的复制是异步的。</p>
+<h5>这是一个明显的竞争条件,表现场景如下:</h5>
+<blockquote>
+<p>1）客户端A在master上获得了锁 。
+2）在将key复制到salve节点前master节点crashes 了。
+3）salve节点被提升为master节点。
+4）客户端B 获取到锁，但是同样的资源已经被客户端A获取了。 违反了安全性!
+如上这样有时是有非常好的效果,在特殊情况下,如出现上述失败情况,即多个客户端可以同时持有的锁。如果可以是这样的话,可以用以复制为基础的解决方案。</p>
+</blockquote>
+<h4><strong>2. 用单一节点如何正确的实现</strong></h4>
+<p>上述试图克服单一节点设置的限制,但让我们分析一下怎么正确的实现在单一节点获得锁。这实际上是一个可行的解决方案在应用竞争条件有时是可以接受的情况下。 后面将会在处理单一节点的基础上描述分布式算法。</p>
+<p>1）获得锁,方法如下:</p>
+<div class="highlight"><pre>SET resource_name my_random_value NX PX 30000
+</pre></div>
+
+
+<p><em>命令将设置key只有在不存在时(NX选项),过期时间为30000毫秒(PX选项)。关键是设置一个“myrandomvalue”的值，这个值需要对所有客户的锁请求保证唯一性。</em></p>
+<p>2）使用一个随机值以便安全的释放锁，删除key只有当key存在并且和当前客户端存储的值一致时。 如下是对应的Lua脚本：</p>
+<div class="highlight"><pre>if redis.call(&quot;get&quot;,KEYS[1]) == ARGV[1] then
+        return redis.call(&quot;del&quot;,KEYS[1])
+    else
+        return 0
+    end
+</pre></div>
+
+
+<p><em>这样做是很重要的，避免了删除了一个已经被其他客户端获得的锁。例如一个客户可能获得锁,进入一些操作但超过锁有效时间(key的时间将到期),后来要删除锁,但这锁已经被其他客户端获取了。仅使用DEL是不安全的，客户端可能删除另一个客户端的锁。</em></p>
+<p>这个随机字符串应该是什么?我认为从/dev/urandom 20字节,但你可以找到更便宜的方法让它独特的足以让你的任务。例如一个安全的选择与/dev/urandom RC4种子,并生成一个伪随机流。更简单的解决方案是使用一个组合的unix微妙时间加上客户端ID,虽然它并不是安全的,但在大多数环境中是可行的。</p>
+<p>3）设置的有效时间，称为“锁有效时间”。即自动释放锁的时间，也是此客户端在另一个客户端再次获取锁前处理操作的时间，没有违反互斥技术保证,将锁限制在一个给定的时间窗口。</p>
+<h4><strong>3.Redlock 算法</strong></h4>
+<p>分布式版本的算法我们假设有N个Redis节点。这些节点是完全独立的,所以我们不要用复制或任何其他隐性的方式协调系统。我们已经描述了如何获取和释放锁在一个安全的实例。在我们的例子中,我们设置N = 5,这是一个合理的值,所以我们需要在不同的计算机或虚拟机运行5个Redis。以确保他们的失败大多是独立的方式。</p>
+<h5>为了获得锁,客户端执行以下操作:</h5>
+<blockquote>
+<p>1) 获得以毫秒为单位的当前时间。
+2) 试图顺序获取锁在所有的N个节点上,在所有实例上使用相同的Key和随机值。在步骤2,在每个实例中设置锁时，客户端使用一个超时（比总的自动释放锁时间小）获得。例如如果自动释放锁时间是10秒,超时可能为 5-50毫秒范围内。这可以防止客户端很长时间试图跟一个不可用的Redis节点保持连接。如果一个实例不可用,我们应该尽快连接下一个实例。
+3) 客户端计算为了获得锁使用的时间，通过当前时间减去在步骤1中获得的时间戳。成功获得锁的因素是：当且仅当客户端能够获得大多数（N / 2 + 1）实例（至少3个）的锁，并且总的使用时间小于锁有效时间。
+4) 如果获取到了锁，其有效时间为初始化的有效时间减去步骤3中计算得到的时间。
+5) 如果客户未能获取锁,由于某种原因(无法获取N / 2 + 1实例的锁或有效时间为负),它将试图释放所有实例(即使实例认为这是无效的锁)的锁。</p>
+</blockquote>
+<h4><strong>4.失败重试</strong></h4>
+<p>当一个客户端不能获取到锁时，应该在一定的随机延时后重试，由于多个客户端同一时间造成的情况（网络发生脑裂时都为成功的情况）。同样最快的一个客户端将获取到大多数实例的锁，但是发生脑裂时还需要重试，所以理想的情况是客户端并行的发送SET命令到N个实例。</p>
+<p>因此当客户端未能获取到大多数实例的锁时，及时释放锁是很重要的，没必要等到Key过期。（当网络发生分裂时客户端无法与Redis实例通信，此时可用性将降低，等待key过期）</p>
+<h4><strong>5.算法安全性</strong></h4>
+<p>该算法安全吗?我们可以试着去理解在不同的场景中会发生什么。</p>
+<p>开始让我们假设一个客户端可以获得大多数实例的锁。所有的实例将包含一个同样的有效时间的key。但是key在不同的时间设置,所以key也会在不同的时间到期。但是如果第一个key是在最坏的情况时间T1(与第一个节点通信前的时间)设置,最后一个key是在最坏的情况时间T2(最后一个节点响应时的时间)设置,我们相信第一个key设置到期将存在至少MIN_VALIDITY = TTL -(T2-T1) -CLOCK_DRIFT 时长。其他的keys将在稍后过期，所以我们确认keys在这一个时间内共存。</p>
+<p>在这个时间点内另一个客户端将不能获取到锁，因为N/2+1 keys 已经存在所以N/2+1 SET NX操作将不能成功。如果锁被获取成功，在同一个时刻将不能再次被取。</p>
+<p>但是我们也想确保多个客户端同时试图获取锁不能同时获得成功。</p>
+<p>如果一个客户端获取大多数实例的锁，但是时间接近或者大于最大的锁有效时间（设置的TTL），被认为锁是无效的，将释放锁。因此我们只需要考虑一下这种情况:一个客户端能够锁定大多数实例的时间小于有效时间。上述观点已经表达了在这种情况下, MIN_VALIDITY时间内没有客户端能够重新获得锁。所以多个客户端能够同时（步骤2后的时间点）锁住N/2+1个实例的时间将大于TTL时间，使得锁无效。</p>
+<p><em>文章中列出了不同语言实现上述算法的实现。为了方便理解文章描述的算法，编写了相应的<a href="https://github.com/jiaoqsh/redis-distributed-lock.git">Java版本的demo</a></em>。</p>
+        </div><!-- /.entry-content -->
+    </article>
+</section>
+</div>
+</div>
+        </div><!--/span-->
+        <div class="span3 well sidebar-nav" id="sidebar">
+<ul class="nav nav-list">
+<li class="nav-header"><h4><i class="icon-external-link"></i>blogroll</h4></li>
+    <li><div><i class="icon-external-link"></i><a href="http://github.com/jiaoqsh/">github</a></div></li>
+<li class="nav-header"><h4><i class="icon-home icon-large"></i> social</h4></li>
+<li><a href="/" rel="alternate"><i class="icon-bookmark icon-large"></i>atom feed</a></li>
+    <li><a href="https://twitter.com/jiaoqsh"><i class="icon-twitter-sign icon-large"></i>twitter</a></li>
+
+<li class="nav-header"><h4><i class="icon-folder-close icon-large"></i>Categories</h4></li>
+<li>
+<a href="/category/architecture.html">
+    <i class="icon-folder-open icon-large"></i>Architecture
+</a>
+</li>
+<li>
+<a href="/category/redis.html">
+    <i class="icon-folder-open icon-large"></i>Redis
+</a>
+</li>
+
+<li class="nav-header"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+    <li class="tag-4">
+        <a href="/tag/redis.html">
+            <i class="icon-tag icon-large"></i>redis
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/logging.html">
+            <i class="icon-tag icon-large"></i>logging
+        </a>
+    </li>
+
+
+</ul>        </div><!--/.well -->
+
+      </div><!--/row-->
+
+      <hr>
+
+    </div><!--/.fluid-container-->
+
+
+    <!-- Le javascript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/theme/js/jquery-1.7.2.min.js"></script>
+    <script src="/theme/js/bootstrap.min.js"></script>
+  </body>
+</html>
