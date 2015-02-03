@@ -123,7 +123,7 @@
         </header>
         <div class="entry-content">
 
-        <p><em><a href="http://jiaoqsh.github.io/microservices-introduction-part1.html">上一篇</a>介绍了microservices架构，这篇将结合实际系统做应用分析。</em></p>
+        <p><em><a href="http://jiaoqsh.github.io/microservices-introduction-part1.html">上一篇</a>介绍了microservices架构，从中我们获知microservices架构需要面临的问题，本文将结合实际系统做应用分析。</em></p>
 <h3>背景</h3>
 <p>系统划分为多个子系统各自提供服务首先是因为系统业务发展的需要和系统分阶段建设的特性决定的，同时由于当时开发团队人员梯度的配置，更能让大家各自专注于相应业务和技术点，更好的保障项目质量（系统上线总结中也证明这样做是合理的）。</p>
 <p>确认子系统划分和服务能力后，很自然的想到SOA架构，但是发现基于SOA的技术（使用ESB集成monolithic应用）实施对我们的系统建设太重量了。</p>
@@ -165,6 +165,7 @@
 <li>web用来定义服务配置，发布服务到web容器</li>
 </ul>
 </blockquote>
+<p>使用Maven的Archetype插件可以快速生成各子系统五个工程的Quickstart代码。</p>
 <p>服务发布的spring配置：</p>
 <div class="highlight"><pre><span class="nt">&lt;bean</span> <span class="na">name=</span><span class="s">&quot;/xxxFacade&quot;</span> <span class="na">class=</span><span class="s">&quot;org.springframework.remoting.caucho.HessianServiceExporter&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;service&quot;</span> <span class="na">ref=</span><span class="s">&quot;xxxFacade&quot;</span> <span class="nt">/&gt;</span>
@@ -309,23 +310,8 @@
 
 <li class="nav-header"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
     <li class="tag-4">
-        <a href="/tag/hessian.html">
-            <i class="icon-tag icon-large"></i>hessian
-        </a>
-    </li>
-    <li class="tag-4">
-        <a href="/tag/logging.html">
-            <i class="icon-tag icon-large"></i>logging
-        </a>
-    </li>
-    <li class="tag-4">
-        <a href="/tag/spring.html">
-            <i class="icon-tag icon-large"></i>spring
-        </a>
-    </li>
-    <li class="tag-4">
-        <a href="/tag/maven.html">
-            <i class="icon-tag icon-large"></i>maven
+        <a href="/tag/elasticsearch.html">
+            <i class="icon-tag icon-large"></i>elasticsearch
         </a>
     </li>
     <li class="tag-4">
@@ -334,8 +320,13 @@
         </a>
     </li>
     <li class="tag-4">
-        <a href="/tag/elasticsearch.html">
-            <i class="icon-tag icon-large"></i>elasticsearch
+        <a href="/tag/hessian.html">
+            <i class="icon-tag icon-large"></i>hessian
+        </a>
+    </li>
+    <li class="tag-2">
+        <a href="/tag/spring.html">
+            <i class="icon-tag icon-large"></i>spring
         </a>
     </li>
     <li class="tag-4">
@@ -343,9 +334,34 @@
             <i class="icon-tag icon-large"></i>jenkins
         </a>
     </li>
+    <li class="tag-4">
+        <a href="/tag/maven.html">
+            <i class="icon-tag icon-large"></i>maven
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/rabbitmq.html">
+            <i class="icon-tag icon-large"></i>rabbitmq
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/mongodb.html">
+            <i class="icon-tag icon-large"></i>mongodb
+        </a>
+    </li>
     <li class="tag-1">
         <a href="/tag/microservices.html">
             <i class="icon-tag icon-large"></i>microservices
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/logging.html">
+            <i class="icon-tag icon-large"></i>logging
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/spring-boot.html">
+            <i class="icon-tag icon-large"></i>spring-boot
         </a>
     </li>
 
