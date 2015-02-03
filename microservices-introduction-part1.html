@@ -62,7 +62,7 @@
           <div class="nav-collapse">
             <ul class="nav">
                 <li class="divider-vertical"></li>
-                <li >
+                <li class="active">
                   <a href="/category/architecture.html">
 						        <i class="icon-folder-open icon-large"></i>Architecture
 					         </a>
@@ -70,11 +70,6 @@
                 <li >
                   <a href="/category/elasticsearch.html">
 						        <i class="icon-folder-open icon-large"></i>Elasticsearch
-					         </a>
-                </li>
-                <li class="active">
-                  <a href="/category/microservices.html">
-						        <i class="icon-folder-open icon-large"></i>microservices
 					         </a>
                 </li>
                 <li >
@@ -134,7 +129,7 @@
 <li>扩展简单：拷贝多份部署包到多台机器前置负载均衡器即可实现</li>
 </ul>
 </blockquote>
-<p>但是随着网站的高速发展，一个巨大的monolithic架构系统将带来许多问题。比如：</p>
+<p>但是随着网站的高速发展，一个庞大的monolithic架构系统将带来许多问题。比如：</p>
 <blockquote>
 <ul>
 <li>开发人员不能容易理解和维护，需要对这个庞大的系统要有全面认知，不易快速上手开发，修改将变的困难。显然重构也将是一件很困难的事情</li>
@@ -153,10 +148,10 @@
 <li>可以灵活的选取更合理的技术，避免长期对单一技术栈的依赖</li>
 </ul>
 </blockquote>
-<p>相比monolithic架构，microservices架构的劣势是：</p>
+<p>相比monolithic架构，采用microservices架构的劣势是：</p>
 <blockquote>
 <ul>
-<li>创建一个分布式系统的额外复杂度。</li>
+<li>创建一个分布式系统的额外复杂度</li>
 </ul>
 <blockquote>
 <ul>
@@ -183,22 +178,22 @@
 <p>以这种方式组织的一个公司是<a href="http://www.comparethemarket.com/">www.comparethemarket.com</a>。跨职能团队负责建造和运营每个产品，每个产品划分为多个服务，服务间通过消息总线通信。</p>
 <h3>3. 产品而不是项目</h3>
 <p>大多数应用程序开发使用项目模型，完成项目任务后即被视为完成。在完成软件后移交给维护人员，同时项目团队解散重组开始新的任务。</p>
-<p>Microservice支持者倾向于避免这种模式，而是认为一个团队应该完成一个产品的完成生命周期。正如Amazon描述的"<a href="https://queue.acm.org/detail.cfm?id=1142065">you build, you run it</a>"。</p>
+<p>Microservice支持者倾向于避免这种模式，而是认为一个团队应该拥有一个产品的完成生命周期。正如Amazon描述的"<a href="https://queue.acm.org/detail.cfm?id=1142065">you build, you run it</a>"。</p>
 <h3>4. smart endpoints and dumb pipes</h3>
-<p>在构建不同进程之间的通信机制时，我们看到了许多产品和方法,主要在处理通信机制本身。比如企业服务总线(ESB)，ESB产品通常包括消息路由的转发,编码,转换和应用业务规则。</p>
-<p>microservice社区则支持另一种方法：smart endpoints 和 dumb pipes。应用程序由microservices组成旨在尽可能实现高内聚低耦合,他们拥有自己的领域逻辑,接收到一个请求时,经过应用程序业务逻辑处理生成一个响应。通过精心设计使用简单RESTish协议而不是复杂的协议如WS-Choreography、BPEL。</p>
+<p>在构建不同进程之间的通信机制时，我们看到了许多产品和方法，主要在处理通信机制本身。比如企业服务总线(ESB)，ESB产品通常包括消息路由的转发，编码，转换和应用业务规则。</p>
+<p>microservice社区则支持另一种方法：smart endpoints 和 dumb pipes。应用程序由microservices组成旨在尽可能实现高内聚低耦合，他们拥有自己的领域逻辑，接收到一个请求时经过应用程序业务逻辑处理生成一个响应。通过精心设计使用简单RESTish协议而不是复杂的协议如WS-Choreography、BPEL。</p>
 <p>最常使用的两种协议是：使用资源描述API的HTTP请求响应和轻量级消息协议。</p>
 <h3>5. 多样的数据管理</h3>
 <p>Microservices喜欢让每个服务管理其自己的数据库,相同的数据库的不同实例,或者完全不同的数据库系统——这被称为 <a href="http://martinfowler.com/bliki/PolyglotPersistence.html">Polyglot Persistence</a>。您可以在monolith中使用Polyglot Persistence,但似乎在microservices中更常用。</p>
 <p>分散的数据更新管理在microservices中有一定的意义。在monolith中常见的方法是使用事务处理更新，更新多个资源时保证一致性。</p>
 <p>使用事务有助于一致性,但需要提升耦合性,这对多服务是有问题的。分布式事务的实现是比较有难度的，因此microservice架构强调服务之间的transactionless，并明确说明可能只是最终一致性或一致性问题是由补偿处理来操作。</p>
-<p>选择以这种方式来管理不一致对于许多开发团队是一个新的挑战，但这是一个经常与业务匹配的实践。通常业务处理一定程度的不一致性,以快速响应需求，同时拥有某种回溯过程来处理错误。如果在一致性上修复错误的成本小于失去业务的成本这样做的代价是值得的。</p>
+<p>选择以这种方式来管理不一致对于许多开发团队是一个新的挑战，但这是一个经常与业务匹配的实践。通常业务处理一定程度的不一致性，以快速响应需求，同时拥有某种回溯过程来处理错误。如果在一致性上修复错误的成本小于失去业务的成本这样做的代价是值得的。</p>
 <h3>6. 故障转移设计</h3>
 <p>服务可能在任何时候失败,重要的是能够及时探测到故障,如果可能的话,自动恢复服务。Microservice应用程序把重点放在应用程序的实时监控，检查架构元素(每秒多少次请求数据库)和业务相关的度量指标(比如每分钟接受的订单个数)。监控系统提供预警,触发开发团队跟进排查问题。</p>
 <p>Microservice团队希望看到为每个单独的服务做完善的监控和日志记录，如用 dashboards 显示向上/向下状态和各种操作与业务相关的度量指标，以及我们常见的服务链路状态、系统当前吞吐量和延迟。</p>
 <h3>参考文章</h3>
-<p>http://microservices.io
-http://martinfowler.com/articles/microservices.html </p>
+<p><a href="http://microservices.io">http://microservices.io</a></p>
+<p><a href="http://martinfowler.com/articles/microservices.html">http://martinfowler.com/articles/microservices.html</a></p>
         </div><!-- /.entry-content -->
     </article>
 </section>
@@ -225,17 +220,17 @@ http://martinfowler.com/articles/microservices.html </p>
 </a>
 </li>
 <li>
-<a href="/category/microservices.html">
-    <i class="icon-folder-open icon-large"></i>microservices
-</a>
-</li>
-<li>
 <a href="/category/redis.html">
     <i class="icon-folder-open icon-large"></i>Redis
 </a>
 </li>
 
 <li class="nav-header"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+    <li class="tag-4">
+        <a href="/tag/microservices.html">
+            <i class="icon-tag icon-large"></i>microservices
+        </a>
+    </li>
     <li class="tag-4">
         <a href="/tag/elasticsearch.html">
             <i class="icon-tag icon-large"></i>elasticsearch
@@ -252,8 +247,8 @@ http://martinfowler.com/articles/microservices.html </p>
         </a>
     </li>
     <li class="tag-4">
-        <a href="/tag/microservices.html">
-            <i class="icon-tag icon-large"></i>microservices
+        <a href="/tag/microservices-spring-hessian-jenkins-maven.html">
+            <i class="icon-tag icon-large"></i>microservices spring hessian jenkins maven
         </a>
     </li>
 
