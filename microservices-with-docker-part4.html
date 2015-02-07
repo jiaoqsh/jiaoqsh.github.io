@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Microservices with Docker - part4 | jiaoqsh's blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="jiaoqsh" />
+    <meta name="kittycheck_rumble" content="true" />
+    <meta name="kittycheck_position" content="top=60,right=60" />
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .tag-1 {
+        font-size: 13pt;
+      }
+      .tag-2 {
+        font-size: 10pt;
+      }
+      .tag-2 {
+        font-size: 8pt;
+      }
+      .tag-4 {
+        font-size: 6pt;
+     }
+    </style>
+    <link href="/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/theme/css/font-awesome.css" rel="stylesheet">
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/theme/img/favicon.ico">
+    <link rel="apple-touch-icon" href="/theme/img/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/theme/img/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/theme/img/apple-touch-icon-114x114.png">
+
+    <link href="/" type="application/atom+xml" rel="alternate" title="jiaoqsh's blog ATOM Feed" />
+  </head>
+  <body>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/index.html">jiaoqsh's blog </a>
+          <div class="nav-collapse">
+            <ul class="nav">
+                <li class="divider-vertical"></li>
+                <li class="active">
+                  <a href="/category/architecture.html">
+						        <i class="icon-folder-open icon-large"></i>Architecture
+					         </a>
+                </li>
+                <li >
+                  <a href="/category/elasticsearch.html">
+						        <i class="icon-folder-open icon-large"></i>Elasticsearch
+					         </a>
+                </li>
+                <li >
+                  <a href="/category/redis.html">
+						        <i class="icon-folder-open icon-large"></i>Redis
+					         </a>
+                </li>
+              <ul class="nav pull-right">
+                    <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+              </ul>
+
+            </ul>
+            <!--<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>-->
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="span8" id="content">
+<div class="row">
+    <div class="span2">
+        <div class="well">
+<footer class="post-info">
+<abbr class="published" title="2015-02-07T17:00:00+08:00">
+    <i class="icon-calendar"></i>&nbsp;周六 07 二月 2015
+</abbr>
+<br/><a href="/author/jiaoqsh.html"><i class="icon-user"></i>&nbsp;jiaoqsh</a>
+
+
+<br/>
+	&nbsp;&nbsp;<a href="/tag/microservices.html" class="label"><i class="icon-tag"></i>&nbsp;microservices</a>
+	&nbsp;&nbsp;<a href="/tag/docker.html" class="label"><i class="icon-tag"></i>&nbsp;docker</a>
+	&nbsp;&nbsp;<a href="/tag/spring-boot.html" class="label"><i class="icon-tag"></i>&nbsp;spring-boot</a>
+	&nbsp;&nbsp;<a href="/tag/mongodb.html" class="label"><i class="icon-tag"></i>&nbsp;mongodb</a>
+	&nbsp;&nbsp;<a href="/tag/rabbitmq.html" class="label"><i class="icon-tag"></i>&nbsp;rabbitmq</a>
+</footer><!-- /.post-info -->        </div>
+    </div>
+    <div class="span6">
+<section id="content" class="well">
+    <article>
+        <header>
+            <h1>
+                <a href=""
+                        rel="bookmark"
+                        title="Permalink to Microservices with Docker - part4">
+                        Microservices with Docker - part4
+                </a>
+            </h1>
+        </header>
+        <div class="entry-content">
+
+        <p><em>前面的文章指出需要将microservices应用无差异的部署到生产环境，本文将使用<a href="https://www.docker.com/">Docker</a>来快速部署基于spring-boot构建的microservices应用。探讨快速标准化部署microservices应用的方法。</em></p>
+<h3>about docker</h3>
+<p>Docker是一个重新定义了程序开发测试、交付和部署过程的开放平台。Docker也是容器技术的一种，它运行于Linux宿主机之上，每个运行的容器都是相互隔离的，也被称为轻量级虚拟技术或容器型虚拟技术。而且它有点类似Java的编译一次，到处运行，Docker则可以称为构建一次，在各种平台上运行，包括本地服务器和云主机等（Build once，run anywhere）。</p>
+<p>具体说来，Docker 在如下几个方面具有较大的优势：</p>
+<blockquote>
+<ul>
+<li>
+<p>更快速的交付和部署。</p>
+<blockquote>
+<ul>
+<li>开发者可以使用一个标准的镜像来构建一套开发容器，开发完成之后，运维人员可以直接使用这个容器来部署代码。 </li>
+<li>Docker 可以快速创建容器，快速迭代应用程序，并让整个过程全程可见，使团队中的其他成员更容易理解应用程序是如何创建和工作的。 </li>
+<li>Docker 容器很轻很快！容器的启动时间是秒级的，大量地节约开发、测试、部署的时间。</li>
+</ul>
+</blockquote>
+</li>
+<li>
+<p>更高效的虚拟化。Docker 容器的运行不需要额外的 hypervisor 支持，它是内核级的虚拟化，因此可以实现更高的性能和效率。</p>
+</li>
+<li>更轻松的迁移和扩展。Docker 容器几乎可以在任意的平台上运行，包括物理机、虚拟机、公有云、私有云、个人电脑、服务器等。 这种兼容性可以让用户把一个应用程序从一个平台直接迁移到另外一个。</li>
+<li>更简单的管理。使用 Docker，只需要小小的修改，就可以替代以往大量的更新工作。所有的修改都以增量的方式被分发和更新，从而实现自动化并且高效的管理。</li>
+</ul>
+</blockquote>
+<h3>spring-boot and docker</h3>
+<p>以<a href="http://jiaoqsh.github.io/microservices-with-spring-boot-part3.html">上一篇</a>为例，基于spring-boot构建的microservices应用打包后是一个可执行jar文件，部署需要如下的条件：</p>
+<blockquote>
+<ul>
+<li>服务程序对应版本的Java环境。JDK的安装、Java环境变量的设置</li>
+<li>安装和配置服务程序需要的第三方应用的信息。如 MongoDB、RabbitMQ</li>
+<li>运行服务程序的命令或脚本</li>
+</ul>
+</blockquote>
+<p>使用docker部署服务程序需要先创建Docker镜像（image），使用从image创建的运行实例即Docker容器（container）运行应用。这里有三个概念：</p>
+<blockquote>
+<ul>
+<li>Docker镜像（image)：Docker 镜像就是一个只读的模板。镜像可以用来创建 Docker 容器。</li>
+<li>Docker容器（container）：Docker 利用容器来运行应用。容器是从镜像创建的运行实例。它可以被启动、开始、停止、删除。每个容器都是相互隔离的、保证安全的平台。</li>
+<li>Docker仓库（repository）：仓库是集中存放镜像文件的场所。仓库分为公开仓库（Public）和私有仓库（Private）两种形式。最大的公开仓库是 <a href="https://hub.docker.com/">Docker Hub</a>，存放了数量庞大的镜像供用户下载。当然，用户也可以在本地网络内创建一个私有仓库。</li>
+</ul>
+</blockquote>
+<p>因此，我们需要进行如下操作：</p>
+<blockquote>
+<ul>
+<li>从repository中获取mongodb、rabbitmq的image，启动container</li>
+<li>编写服务程序的Dockerfile，创建image</li>
+<li>设置运行参数，创建服务程序的container，运行服务程序</li>
+</ul>
+</blockquote>
+<h3>deploying infrastructure services</h3>
+<p>1）mongodb 
+从 repository 中获取 image ：</p>
+<div class="highlight"><pre>docker pull mongo
+</pre></div>
+
+
+<p>创建 container 并启动：</p>
+<div class="highlight"><pre>docker run -d -p 27017:27017 -v /home/app/docker/mongodb:/data/db --name mongodb mongo
+</pre></div>
+
+
+<p>2）rabbitmq 
+从 repository 中获取 image ：</p>
+<div class="highlight"><pre>docker pull rabbitmq
+</pre></div>
+
+
+<p>创建 container 并启动：</p>
+<div class="highlight"><pre>docker run -d -p 5672:5672 -p 15672:15672 -v /home/app/docker/rabbitmq/log:/data/log -v /home/app/docker/rabbitmq/data:/data/mnesia --name rabbitmq  rabbitmq
+</pre></div>
+
+
+<h3>deploying spring-boot with docker</h3>
+<p>1）编写Dockerfile</p>
+<div class="highlight"><pre># Pull base image.
+FROM dockerfile/java:oracle-java7
+# Define working directory.
+WORKDIR /data
+# Copy file to the filesystem of the container
+COPY bulid/user-registration-backend-*.jar /data/user-registration-backend.jar 
+# Expose ports.
+EXPOSE 8080
+# Define default command.
+CMD java -jar user-registration-backend.jar
+</pre></div>
+
+
+<p>2）从Dockerfile创建image</p>
+<div class="highlight"><pre>docker build -t user_registration . 
+</pre></div>
+
+
+<p>3）设置运行参数，创建服务程序的container，运行服务程序</p>
+<p>根据 spring-boot 的配置特性可以识别系统环境变量参数，参数设置如下</p>
+<div class="highlight"><pre>docker run -d -p 8080:8080 \
+-e SPRING_DATA_MONGODB_HOST=127.0.0.1  \
+-e SPRING_RABBITMQ_HOST=127.0.0.1 \
+--name user-registration-demo user_registration
+</pre></div>
+
+
+<p>4) 查看容器运行日志</p>
+<div class="highlight"><pre>docker logs user-registration-demo
+</pre></div>
+
+
+<p>注意：上面的演示中将mongodb和rabbitmq的端口暴露到了外部网络。为了避免此问题，使用 --link 参数可以让容器之间安全的进行交互。如下：</p>
+<div class="highlight"><pre>docker run -d -v /home/app/docker/mongodb:/data/db --name mongodb mongo
+docker run -d -p 8080:8080 --link mongodb:mongodb \
+-e SPRING_DATA_MONGODB_HOST=127.0.0.1  \
+--name user-registration-demo user_registration
+</pre></div>
+
+
+<p>Docker 在两个互联的容器之间创建了一个安全隧道，而且不用映射它们的端口到宿主主机上。在启动 mongodb 容器的时候并没有使用 -p 和 -P 标记，从而避免了暴露数据库端口到外部网络上。</p>
+<h3>use fig</h3>
+<p>同时我们可以选择使用 <a href="http://www.fig.sh/">Fig</a> 快速搭建基于 Docker 的隔离开发环境。添加一个 fig.yml 文件，并指定一些简单的内容，执行 fig up 它就能帮你快速建立起一个容器。</p>
+<p>在上面的 Dockerfile 路径位置，添加一个fig.yml 文件，编写：</p>
+<div class="highlight"><pre><span class="n">web</span><span class="o">:</span>
+  <span class="n">build</span><span class="o">:</span> <span class="o">.</span>
+  <span class="n">command</span><span class="o">:</span> <span class="n">java</span> <span class="o">-</span><span class="n">jar</span> <span class="n">user</span><span class="o">-</span><span class="n">registration</span><span class="o">-</span><span class="n">backend</span><span class="o">.</span><span class="na">jar</span> 
+  <span class="n">links</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">mongodb</span>
+    <span class="o">-</span> <span class="n">rabbitmq</span>
+  <span class="n">ports</span><span class="o">:</span>
+    <span class="o">-</span> <span class="s2">&quot;8000:8000&quot;</span>
+<span class="n">mongodb</span><span class="o">:</span>
+  <span class="n">image</span><span class="o">:</span> <span class="n">mongo</span>
+  <span class="n">volumes</span><span class="o">:</span> 
+    <span class="o">-</span> <span class="sr">/home/app/docker/mongodb: /data/</span><span class="n">db</span> 
+<span class="n">rabbitmq</span><span class="o">:</span>
+  <span class="n">image</span><span class="o">:</span> <span class="n">rabbitmq</span>
+  <span class="n">volumes</span><span class="o">:</span> 
+    <span class="o">-</span> <span class="sr">/home/app/docker/rabbitmq/log: /data/</span><span class="n">log</span>
+    <span class="o">-</span> <span class="sr">/home/app/docker/rabbitmq/data: /data/</span><span class="n">mnesia</span>
+</pre></div>
+
+
+<p>然后运行 fig up ，即可快速创建出一个容器。</p>
+        </div><!-- /.entry-content -->
+    </article>
+</section>
+</div>
+</div>
+        </div><!--/span-->
+        <div class="span3 well sidebar-nav" id="sidebar">
+<ul class="nav nav-list">
+<li class="nav-header"><h4><i class="icon-external-link"></i>blogroll</h4></li>
+    <li><div><i class="icon-external-link"></i><a href="http://github.com/jiaoqsh/">github</a></div></li>
+<li class="nav-header"><h4><i class="icon-home icon-large"></i> social</h4></li>
+<li><a href="/" rel="alternate"><i class="icon-bookmark icon-large"></i>atom feed</a></li>
+    <li><a href="https://twitter.com/jiaoqsh"><i class="icon-twitter-sign icon-large"></i>twitter</a></li>
+
+<li class="nav-header"><h4><i class="icon-folder-close icon-large"></i>Categories</h4></li>
+<li>
+<a href="/category/architecture.html">
+    <i class="icon-folder-open icon-large"></i>Architecture
+</a>
+</li>
+<li>
+<a href="/category/elasticsearch.html">
+    <i class="icon-folder-open icon-large"></i>Elasticsearch
+</a>
+</li>
+<li>
+<a href="/category/redis.html">
+    <i class="icon-folder-open icon-large"></i>Redis
+</a>
+</li>
+
+<li class="nav-header"><a href="/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+    <li class="tag-4">
+        <a href="/tag/maven.html">
+            <i class="icon-tag icon-large"></i>maven
+        </a>
+    </li>
+    <li class="tag-2">
+        <a href="/tag/rabbitmq.html">
+            <i class="icon-tag icon-large"></i>rabbitmq
+        </a>
+    </li>
+    <li class="tag-2">
+        <a href="/tag/spring.html">
+            <i class="icon-tag icon-large"></i>spring
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/docker.html">
+            <i class="icon-tag icon-large"></i>docker
+        </a>
+    </li>
+    <li class="tag-1">
+        <a href="/tag/microservices.html">
+            <i class="icon-tag icon-large"></i>microservices
+        </a>
+    </li>
+    <li class="tag-2">
+        <a href="/tag/spring-boot.html">
+            <i class="icon-tag icon-large"></i>spring-boot
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/redis.html">
+            <i class="icon-tag icon-large"></i>redis
+        </a>
+    </li>
+    <li class="tag-2">
+        <a href="/tag/mongodb.html">
+            <i class="icon-tag icon-large"></i>mongodb
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/logging.html">
+            <i class="icon-tag icon-large"></i>logging
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/jenkins.html">
+            <i class="icon-tag icon-large"></i>jenkins
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/elasticsearch.html">
+            <i class="icon-tag icon-large"></i>elasticsearch
+        </a>
+    </li>
+    <li class="tag-4">
+        <a href="/tag/hessian.html">
+            <i class="icon-tag icon-large"></i>hessian
+        </a>
+    </li>
+
+
+</ul>        </div><!--/.well -->
+
+      </div><!--/row-->
+
+      <hr>
+
+    </div><!--/.fluid-container-->
+
+
+    <!-- Le javascript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/theme/js/jquery-1.7.2.min.js"></script>
+    <script src="/theme/js/bootstrap.min.js"></script>
+  </body>
+</html>
