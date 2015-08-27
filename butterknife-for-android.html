@@ -141,7 +141,7 @@
 </ul>
 </blockquote>
 <h3>butterknife 的总体设计</h3>
-<p><img alt="Alt text" src="./1440597960564.png" /></p>
+<p><img alt="butterknife总体设计" src="./images/2015082701.png" /></p>
 <ul>
 <li>
 <p><strong>ButterKnifeProcessor</strong>: 继承 AbstractProcessor 类，重写了 getSupportedAnnotationTypes 和 process 方法。JVM编译阶段在 process 方法中读取 类文件中定义的 butterknife Annotation，生成相应的 class 文件（形如：XXX$$ViewBinder）。</p>
@@ -163,30 +163,7 @@
 <ul>
 <li>bind 和 unbind 都调用了 findViewBinderForClass 查找实际要执行的类。findViewBinderForClass 的查找逻辑实现流程图如下：</li>
 </ul>
-<div class="highlight"><pre><span class="x">st=&gt;start: Start</span>
-<span class="x">e=&gt;end</span>
-<span class="x">op1=&gt;operation: 从静态的Map缓存对象中查找</span>
-<span class="x">cond1=&gt;condition: </span>
-<span class="x">op2=&gt;operation: 判断类的包名是否为</span>
-<span class="x">&quot;android.&quot;和&quot;java.&quot;？</span>
-<span class="x">cond2=&gt;condition: </span>
-<span class="x">op3=&gt;operation: 反射创建clsName+</span>
-<span class="x">&quot;</span><span class="p">$$</span><span class="nv">ViewBinder</span><span class="x">&quot;类实例</span>
-<span class="x">cond3=&gt;condition: </span>
-<span class="x">op4=&gt;operation: 传入cls.getSuperclass()递归</span>
-<span class="x">调用findViewBinderForClass</span>
-<span class="x">op5=&gt;operation: 将创建的实例放入Map缓存对象</span>
-
-<span class="x">st-&gt;op1-&gt;cond1</span>
-<span class="x">cond1(yes)-&gt;e</span>
-<span class="x">cond1(no)-&gt;op2-&gt;cond2</span>
-<span class="x">cond2(no)-&gt;op3-&gt;cond3</span>
-<span class="x">cond3(yes)-&gt;op5</span>
-<span class="x">cond3(no)-&gt;op4</span>
-<span class="x">cond4(yes)</span>
-</pre></div>
-
-
+<p><img alt="findViewBinderForClass 的查找逻辑实现流程图" src="./images/2015082702.png" /></p>
 <ul>
 <li>apply 方法
 用于对一组元素执行相同的逻辑操作。如下所示：</li>
