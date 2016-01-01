@@ -255,8 +255,12 @@
 <p><strong>start()</strong></p>
 <p><img alt="LeaderSelector start" src="./images/leader_selector_start_2.png" /></p>
 <ol>
-<li>LeaderSelector 的 start() 方法被调用后，添加 LeaderSelectorListener，requeue() 调用 internalRequeue() 方法，判断是否为 autoRequeue， 如果是则递归调用 internalRequeue() 方法。通过 CloseableExecutorService 执行doWorkLoop()方法，然后调用 mutex.acquire() 阻塞获取锁，如果获取到锁，则调用 listener.takeLeadership(client) 通知客户端被选举为 leader；否则等待获取锁。</li>
-<li>LockInternals 执行 attemptLock() 方法时，先是在 zookeeper 上创建一个 EPHEMERAL_SEQUENTIAL 类型的节点。然后循环 (循环结束的条件为：获取到锁，设置了 wait(millisToWait) ) 执行：调用 getSortedChildren() 获取该选举路径上所有排序过的 children 节点集合，然后判断当前节点是否为第一个顺序节点，即编号最小的节点。判断方法如下：</li>
+<li>
+<p>LeaderSelector 的 start() 方法被调用后，添加 LeaderSelectorListener，requeue() 调用 internalRequeue() 方法，判断是否为 autoRequeue， 如果是则递归调用 internalRequeue() 方法。通过 CloseableExecutorService 执行doWorkLoop()方法，然后调用 mutex.acquire() 阻塞获取锁，如果获取到锁，则调用 listener.takeLeadership(client) 通知客户端被选举为 leader；否则等待获取锁。</p>
+</li>
+<li>
+<p>LockInternals 执行 attemptLock() 方法时，先是在 zookeeper 上创建一个 EPHEMERAL_SEQUENTIAL 类型的节点。然后循环 (循环结束的条件为：获取到锁，设置了 wait(millisToWait) ) 执行：调用 getSortedChildren() 获取该选举路径上所有排序过的 children 节点集合，然后判断当前节点是否为第一个顺序节点，即编号最小的节点。判断方法如下：</p>
+</li>
 </ol>
 <div class="highlight"><pre>    <span class="kd">public</span> <span class="n">PredicateResults</span> <span class="nf">getsTheLock</span><span class="o">(</span><span class="n">CuratorFramework</span> <span class="n">client</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">children</span><span class="o">,</span> <span class="n">String</span> <span class="n">sequenceNodeName</span><span class="o">,</span> <span class="kt">int</span> <span class="n">maxLeases</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
         <span class="kt">int</span> <span class="n">ourIndex</span> <span class="o">=</span> <span class="n">children</span><span class="o">.</span><span class="na">indexOf</span><span class="o">(</span><span class="n">sequenceNodeName</span><span class="o">);</span>
@@ -286,8 +290,12 @@
 
 
 <ol>
-<li>参加选举的节点一般继承 LeaderSelectorListenerAdapter 类，该节点被选举为 leader 节点后，takeLeadership 方法将被调用。</li>
-<li>执行完3后，还需保证释放锁，以便其他选举节点能被选为 leader 节点。当然你可以在takeLeadership方法中一直循环持有 leader 节点。</li>
+<li>
+<p>参加选举的节点一般继承 LeaderSelectorListenerAdapter 类，该节点被选举为 leader 节点后，takeLeadership 方法将被调用。</p>
+</li>
+<li>
+<p>执行完3后，还需保证释放锁，以便其他选举节点能被选为 leader 节点。当然你可以在takeLeadership方法中一直循环持有 leader 节点。</p>
+</li>
 </ol>
 <p><strong>close()</strong></p>
 <div class="highlight"><pre><span class="kd">public</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">close</span><span class="o">()</span>
@@ -338,24 +346,26 @@
 <p><strong>start()</strong></p>
 <p><img alt="LeaderLatch start" src="./images/leader_latch_start_2.png" /></p>
 <ol>
-<li>通过 AfterConnectionEstablished 执行 client.blockUntilConnected() ，确保正确连接后，再执行 leaderLatch。</li>
-<li>在 latchPath 上创建 EPHEMERAL_SEQUENTIAL 节点</li>
+<li>
+<p>通过 AfterConnectionEstablished 执行 client.blockUntilConnected() ，确保正确连接后，再执行 leaderLatch。</p>
+</li>
+<li>
+<p>在 latchPath 上创建 EPHEMERAL_SEQUENTIAL 节点</p>
+</li>
 </ol>
 <div class="highlight"><pre><span class="n">client</span><span class="o">.</span><span class="na">create</span><span class="o">().</span><span class="na">creatingParentContainersIfNeeded</span><span class="o">().</span><span class="na">withProtection</span><span class="o">().</span><span class="na">withMode</span><span class="o">(</span><span class="n">CreateMode</span><span class="o">.</span><span class="na">EPHEMERAL_SEQUENTIAL</span><span class="o">).</span><span class="na">inBackground</span><span class="o">(</span><span class="n">callback</span><span class="o">).</span><span class="na">forPath</span><span class="o">(</span><span class="n">ZKPaths</span><span class="o">.</span><span class="na">makePath</span><span class="o">(</span><span class="n">latchPath</span><span class="o">,</span> <span class="n">LOCK_NAME</span><span class="o">),</span> <span class="n">LeaderSelector</span><span class="o">.</span><span class="na">getIdBytes</span><span class="o">(</span><span class="n">id</span><span class="o">));</span>
 </pre></div>
 
 
 <ol>
-<li>
-<p>获取 latchPath 上的 children 节点，并调用 checkLeadership(children) 方法。</p>
+<li>获取 latchPath 上的 children 节点，并调用 checkLeadership(children) 方法。</li>
+</ol>
 <blockquote>
 <p>1) 执行 LockInternals.getSortedChildren(LOCK_NAME, sorter, children) 获取排序后的 sortedChildren
 2) 查找当前节点在 sortedChildren 中的位置，如果 ourIndex &lt; 0 ，重新从步骤 2 开始；如果 ourIndex == 0，调用setLeadership(true)；否则，watch 前一个节点路径， watch 到 NodeDeleted 事件时，再次执行步骤3。</p>
 </blockquote>
-</li>
-<li>
-<p>调用 setLeadership() 设置 leader</p>
-</li>
+<ol>
+<li>调用 setLeadership() 设置 leader</li>
 </ol>
 <div class="highlight"><pre><span class="kd">private</span> <span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">setLeadership</span><span class="o">(</span><span class="kt">boolean</span> <span class="n">newValue</span><span class="o">)</span> <span class="o">{</span>
         <span class="kt">boolean</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="n">hasLeadership</span><span class="o">.</span><span class="na">getAndSet</span><span class="o">(</span><span class="n">newValue</span><span class="o">);</span>
