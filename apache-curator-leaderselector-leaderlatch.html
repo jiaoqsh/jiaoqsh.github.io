@@ -253,7 +253,7 @@
 
 <h5>实现过程简述</h5>
 <p><strong>start()</strong></p>
-<p><img alt="LeaderSelector start" src="./images/leader_selector_start.png" /></p>
+<p><img alt="LeaderSelector start" src="./images/leader_selector_start_2.png" /></p>
 <ol>
 <li>LeaderSelector 的 start() 方法被调用后，添加 LeaderSelectorListener，requeue() 调用 internalRequeue() 方法，判断是否为 autoRequeue， 如果是则递归调用 internalRequeue() 方法。通过 CloseableExecutorService 执行doWorkLoop()方法，然后调用 mutex.acquire() 阻塞获取锁，如果获取到锁，则调用 listener.takeLeadership(client) 通知客户端被选举为 leader；否则等待获取锁。</li>
 <li>LockInternals 执行 attemptLock() 方法时，先是在 zookeeper 上创建一个 EPHEMERAL_SEQUENTIAL 类型的节点。然后循环 (循环结束的条件为：获取到锁，设置了 wait(millisToWait) ) 执行：调用 getSortedChildren() 获取该选举路径上所有排序过的 children 节点集合，然后判断当前节点是否为第一个顺序节点，即编号最小的节点。判断方法如下：</li>
@@ -336,7 +336,7 @@
 
 <h5>实现过程简述</h5>
 <p><strong>start()</strong></p>
-<p><img alt="LeaderLatch start" src="./images/leader_latch_start.png" /></p>
+<p><img alt="LeaderLatch start" src="./images/leader_latch_start_2.png" /></p>
 <ol>
 <li>通过 AfterConnectionEstablished 执行 client.blockUntilConnected() ，确保正确连接后，再执行 leaderLatch。</li>
 <li>在 latchPath 上创建 EPHEMERAL_SEQUENTIAL 节点</li>
