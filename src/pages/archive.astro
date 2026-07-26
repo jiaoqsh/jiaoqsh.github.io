@@ -1,0 +1,42 @@
+---
+// Archive: every post, grouped by year, newest first.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { getSortedPosts } from '../lib/posts';
+
+const posts = await getSortedPosts();
+
+// Group posts by year. Use UTC to match how date-only frontmatter is parsed,
+// otherwise a Jan 1 post lands in the previous year on machines behind UTC.
+const groups = new Map<number, typeof posts>();
+for (const post of posts) {
+  const year = post.data.pubDate.getUTCFullYear();
+  if (!groups.has(year)) groups.set(year, []);
+  groups.get(year)!.push(post);
+}
+const years = [...groups.keys()].sort((a, b) => b - a);
+---
+
+<BaseLayout title="归档" description="全部文章归档">
+  <h1 class="page-title">归档</h1>
+  <p style="color: var(--text-dim); margin-top: -1rem; margin-bottom: 2.5rem">
+    共 {posts.length} 篇文章。
+  </p>
+
+  {
+    years.map((year) => (
+      <section class="year-group">
+        <h2>{year}</h2>
+        <ul class="archive-list">
+          {groups.get(year)!.map((post) => (
+            <li>
+              <FormattedDate date={post.data.pubDate} />
+              <a href={`/posts/${post.id}`}>{post.data.title}</a>
+              {post.data.archived && <span class="badge">归档</span>}
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</BaseLayout>

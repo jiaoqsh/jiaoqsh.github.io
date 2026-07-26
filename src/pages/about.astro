@@ -1,0 +1,29 @@
+---
+// About page. Edit the prose below to your liking.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIAL } from '../config';
+---
+
+<BaseLayout title="关于" description="关于 jiaoqsh 和这个博客">
+  <h1 class="page-title">关于</h1>
+
+  <div class="prose">
+    <p>
+      你好，我是 <strong>jiaoqsh</strong>。一名工程师，做过不少后端与分布式系统的工作 ——
+      微服务、Redis、ZooKeeper、Elasticsearch 等都曾是日常。这些年的笔记还留在
+      <a href="/archive">归档</a> 里。
+    </p>
+
+    <p>
+      这里记录我对 <strong>AI</strong> 的思考、实践与观点 ——
+      从模型与工程，到它如何改变我们的工作与生活。用文字把一些想法慢慢写清楚。
+    </p>
+
+    <p>
+      如果你对某篇文章有想法，欢迎在
+      {SOCIAL.github && <a href={SOCIAL.github}>GitHub</a>}
+      上找到我，或通过
+      <a href="/rss.xml">RSS</a> 订阅更新。
+    </p>
+  </div>
+</BaseLayout>

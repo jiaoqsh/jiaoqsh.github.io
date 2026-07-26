@@ -1,0 +1,31 @@
+---
+// Base HTML shell shared by every page.
+import { SITE } from '../config';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogType?: string;
+}
+
+const { title, description, ogType } = Astro.props;
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <BaseHead title={title} description={description} ogType={ogType} />
+  </head>
+  <body>
+    <Header />
+    <main class="site-main">
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+    <Footer />
+  </body>
+</html>

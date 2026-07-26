@@ -1,0 +1,58 @@
+---
+// Individual post page.
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { getSortedPosts } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getSortedPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      // posts are newest-first, so i-1 is newer and i+1 is older
+      newer: posts[i - 1] ?? null,
+      older: posts[i + 1] ?? null,
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { post, newer, older } = Astro.props;
+const { title, description, pubDate, updatedDate, tags, category, archived } =
+  post.data;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={title} description={description} ogType="article">
+  <article>
+    <header class="post-header">
+      <h1>{title}</h1>
+      <div class="post-meta">
+        <FormattedDate date={pubDate} />
+        {updatedDate && <span>· 更新于 <FormattedDate date={updatedDate} /></span>}
+        {category && <span>· {category}</span>}
+        {tags.map((tag) => (
+          <a href={`/tags/${encodeURIComponent(tag)}`} class="badge">#{tag}</a>
+        ))}
+      </div>
+      {
+        archived && (
+          <p class="archived-note">
+            这是一篇从旧博客迁移而来的历史文章，内容与写作时间保持原貌。
+          </p>
+        )
+      }
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <nav class="post-nav">
+      {older ? <a class="prev" href={`/posts/${older.id}`}>{older.data.title}</a> : <span></span>}
+      {newer ? <a class="next" href={`/posts/${newer.id}`}>{newer.data.title}</a> : <span></span>}
+    </nav>
+  </article>
+</BaseLayout>

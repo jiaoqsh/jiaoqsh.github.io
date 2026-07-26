@@ -1,0 +1,28 @@
+---
+// Per-tag page: all posts carrying a given tag.
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getSortedPosts } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  const posts = await getSortedPosts();
+  const tags = new Set(posts.flatMap((p) => p.data.tags));
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: { tag, posts: posts.filter((p) => p.data.tags.includes(tag)) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签：${tag}`} description={`标签 ${tag} 下的文章`}>
+  <h1 class="page-title">标签：{tag}</h1>
+  <p style="color: var(--text-dim); margin-top: -1rem; margin-bottom: 2rem">
+    共 {posts.length} 篇 · <a href="/tags">全部标签</a>
+  </p>
+  <ul class="post-list">
+    {posts.map((post) => <PostCard post={post} />)}
+  </ul>
+</BaseLayout>

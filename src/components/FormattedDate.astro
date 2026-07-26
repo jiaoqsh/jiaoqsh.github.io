@@ -1,0 +1,19 @@
+---
+// Render a date as a localized <time> element with a machine-readable datetime.
+interface Props {
+  date: Date;
+}
+const { date } = Astro.props;
+
+// Frontmatter dates are date-only, parsed as UTC midnight. Format in UTC so the
+// rendered date does not shift with the build machine's timezone.
+const iso = date.toISOString().slice(0, 10);
+const display = date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+---
+
+<time datetime={iso}>{display}</time>

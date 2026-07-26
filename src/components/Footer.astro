@@ -1,0 +1,23 @@
+---
+// Site footer: copyright and social links.
+import { SITE, SOCIAL } from '../config';
+
+const year = new Date().getFullYear();
+
+// Keep only social links that are filled in.
+const links = [
+  { label: 'GitHub', href: SOCIAL.github },
+  { label: 'Twitter', href: SOCIAL.twitter },
+  { label: 'Email', href: SOCIAL.email ? `mailto:${SOCIAL.email}` : '' },
+  { label: 'RSS', href: SOCIAL.rss },
+].filter((l) => l.href);
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© {year} {SITE.author}</span>
+    <nav class="social" aria-label="社交链接">
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+  </div>
+</footer>

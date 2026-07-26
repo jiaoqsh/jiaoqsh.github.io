@@ -1,0 +1,27 @@
+---
+// Tags index: a cloud of all tags with post counts.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTagCounts } from '../../lib/posts';
+
+const counts = await getTagCounts();
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<BaseLayout title="标签" description="按标签浏览文章">
+  <h1 class="page-title">标签</h1>
+
+  {
+    tags.length > 0 ? (
+      <div class="tag-cloud">
+        {tags.map(([tag, count]) => (
+          <a href={`/tags/${encodeURIComponent(tag)}`}>
+            {tag}
+            <span class="count">{count}</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p style="color: var(--text-dim)">还没有标签。</p>
+    )
+  }
+</BaseLayout>

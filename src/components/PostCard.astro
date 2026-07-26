@@ -1,0 +1,23 @@
+---
+// A single entry in a post list (home, tag pages).
+import type { Post } from '../lib/posts';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const { title, description, pubDate, category, archived } = post.data;
+---
+
+<li class="post-item">
+  <a class="post-link" href={`/posts/${post.id}`}>
+    <h3 class="post-title">{title}</h3>
+    <div class="post-meta">
+      <FormattedDate date={pubDate} />
+      {category && <span>· {category}</span>}
+      {archived && <span class="badge">归档</span>}
+    </div>
+    {description && <p class="post-desc">{description}</p>}
+  </a>
+</li>

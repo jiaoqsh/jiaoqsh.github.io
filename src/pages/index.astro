@@ -1,0 +1,35 @@
+---
+// Home: short intro + the latest (non-archived) posts.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getSortedPosts } from '../lib/posts';
+import { SITE } from '../config';
+
+const all = await getSortedPosts();
+const posts = all.filter((p) => !p.data.archived);
+const hasArchive = all.some((p) => p.data.archived);
+---
+
+<BaseLayout title={SITE.title}>
+  <h1 class="sr-only">文章</h1>
+
+  {
+    posts.length > 0 ? (
+      <ul class="post-list">
+        {posts.map((post) => (
+          <PostCard post={post} />
+        ))}
+      </ul>
+    ) : (
+      <p style="color: var(--text-dim)">还没有发布文章，敬请期待。</p>
+    )
+  }
+
+  {
+    hasArchive && (
+      <p style="margin-top: 2rem">
+        <a href="/archive">查看全部文章与历史技术归档 →</a>
+      </p>
+    )
+  }
+</BaseLayout>
