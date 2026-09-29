@@ -30,7 +30,7 @@ draft: true        # visible in local preview; hidden from production builds and
 ---
 ```
 
-Preview the post locally, set `draft` to `false`, then commit and push to publish. Do not rename a published post's file, or links already shared will break.
+Preview the post locally, set `draft` to `false`, then commit and push to publish. If you rename a published post's file, add a redirect from the old URL under `redirects` in `astro.config.mjs` so links already shared keep working.
 
 ## Project layout
 
