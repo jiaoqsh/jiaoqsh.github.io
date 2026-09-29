@@ -1,44 +1,44 @@
 # jiaoqsh.github.io
 
-个人博客，记录与分享关于 AI 的思考、实践与观点：<https://jiaoqsh.github.io>
+Personal blog with notes and essays on AI: <https://jiaoqsh.github.io>
 
-基于 [Astro](https://astro.build) 构建，推送到 `master` 后由 GitHub Actions 自动部署到 GitHub Pages。
+Built with [Astro](https://astro.build). Every push to `master` is deployed to GitHub Pages by GitHub Actions.
 
-## 本地开发
+## Local development
 
-需要 Node.js 22.12 及以上。
+Requires Node.js 22.12 or later.
 
 ```sh
 npm install
-npm run dev       # 本地预览：http://localhost:4321
-npm run build     # 生产构建，输出到 dist/
-npm run preview   # 预览生产构建
+npm run dev       # local preview at http://localhost:4321
+npm run build     # production build into dist/
+npm run preview   # preview the production build
 ```
 
-## 写文章
+## Writing a post
 
-在 `src/content/posts/` 下新建一个 Markdown 文件，文件名即文章地址（`/posts/<文件名>/`）。frontmatter 字段定义在 `src/content.config.ts`：
+Create a Markdown file in `src/content/posts/`. The file name becomes the post URL (`/posts/<file-name>/`). Frontmatter fields are defined in `src/content.config.ts`:
 
 ```yaml
 ---
-title: "文章标题"
-description: "列表页和 RSS 中显示的摘要"
+title: "Post title"
+description: "Summary shown in post lists and RSS"
 pubDate: 2026-09-28
 category: "AI"
 tags: ["AI", "Agent"]
-draft: true        # 草稿：本地预览可见，生产构建和 RSS 中隐藏
+draft: true        # visible in local preview; hidden from production builds and RSS
 ---
 ```
 
-写完后本地预览确认，把 `draft` 改为 `false`，再提交推送即可发布。文章发布后不要改文件名，否则已分享的链接会失效。
+Preview the post locally, set `draft` to `false`, then commit and push to publish. Do not rename a published post's file, or links already shared will break.
 
-## 目录结构
+## Project layout
 
-| 路径 | 内容 |
+| Path | Contents |
 |---|---|
-| `src/content/posts/` | 文章 |
-| `src/config.ts` | 站点标题、描述、导航、社交链接 |
-| `src/pages/` | 首页、归档、标签、关于、RSS 等页面 |
-| `src/components/`、`src/layouts/` | 页面组件与布局 |
-| `public/` | 静态资源（图片、favicon） |
-| `.github/workflows/deploy.yml` | GitHub Pages 部署流程 |
+| `src/content/posts/` | Posts |
+| `src/config.ts` | Site title, description, navigation, social links |
+| `src/pages/` | Home, archive, tags, about, and RSS pages |
+| `src/components/`, `src/layouts/` | Page components and layout |
+| `public/` | Static assets (images, favicon) |
+| `.github/workflows/deploy.yml` | GitHub Pages deployment |
